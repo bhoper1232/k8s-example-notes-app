@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notesapp-deployment
+  labels:
+    app: notesapp-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notesapp-deployment
+  template:
+    metadata:
+      name: notesapp-deployment
+      labels:
+        app: notesapp-deployment
+    spec:
+      containers:
+        - name: notesapp
+          image: bhoper/notesapp:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/notesdb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: postgres
+          imagePullPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: notesapp-svc
+spec:
+  selector:
+    app: notesapp-deployment
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+
+---
